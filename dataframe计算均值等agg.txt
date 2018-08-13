@@ -1,0 +1,60 @@
+val df2  = df1.groupBy("pollutantcode").agg("revisedzsstrength"->"max","revisedzsstrength"->"min","revisedzsstrength"->"avg","revisedzsstrength"->"stddev").withColumnRenamed("max(revisedzsstrength)","max").withColumnRenamed("min(revisedzsstrength)","min").withColumnRenamed("avg(revisedzsstrength)","avg").withColumnRenamed("stddev(revisedzsstrength)","stddev").collect().toArray
+
+
+
+
+nohup sh /opt/spark-2.1.1/bin/spark-submit --master spark://cdh-0:7077 --total-executor-cores 60 --executor-memory 8g --executor-cores 4 FactDataClean.jar 201301 1 /opt/spark-2.1.1/conf/hive-site.xml 20 >FachourClean.log 2>&1 &
+
+
+insert overwrite table 
+ods_cems_gas.o_gasfachourdata_new 
+partition(month="+ month +") 
+select t1.pscode,
+t1.outputcode,
+t1.pollutantcode,
+t1.monitortime,
+t1.minstrength,
+t1.avgstrength,
+t1.maxstrength,
+t1.avgflow,
+t1.maxflow,
+t1.minflow,
+t1.revisedstrength,
+case when t1.revisedflow>t2.NinefiveP then t2.fiveP else t1.revisedflow end revisedflow,
+t1.couflow,
+t1.updatedate,
+t1.isexception,
+t1.typerunit,
+t1.typername,
+t1.datasource,
+t1.availablestatus,
+t1.revisecause,
+t1.lastexamineflag,
+t1.revisedtime,
+t1.exchangedate,
+t1.indatatime,
+t1.updated_time 
+from s_gasfachourdata t1 
+left join Quantile t2 on t1.pscode=t2.pscode and t1.outputcode=t2.outputcode and t1.pollutantcode=t2.pollutantcode
+
+
+
+
+
+
+matplotlib.pyplot.hist(  
+    x, bins=10, range=None, normed=False,   
+    weights=None, cumulative=False, bottom=None,   
+    histtype=u'bar', align=u'mid', orientation=u'vertical',   
+    rwidth=None, log=False, color=None, label=None, stacked=False,   
+    hold=None, **kwargs)  
+x : (n,) array or sequence of (n,) arrays
+这个参数是指定每个bin(箱子)分布的数据,对应x轴
+bins : integer or array_like, optional
+这个参数指定bin(箱子)的个数,也就是总共有几条条状图
+normed : boolean, optional
+If True, the first element of the return tuple will be the counts normalized to form a probability density, i.e.,n/(len(x)`dbin)
+这个参数指定密度,也就是每个条状图的占比例比,默认为1
+color : color or array_like of colors or None, optional
+这个指定条状图的颜色
+我们绘制一个10000个数据的分布条状图,共50份,以统计10000分的分布情况

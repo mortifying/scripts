@@ -1,0 +1,48 @@
+CREATE TABLE `quantile_ps`( 
+ `pscode` string,  
+ `outputcode` string,  
+ `pollutantcode` string,  
+ `monthstart` int,
+ `monthend` int,
+ `avg` double,  
+ `fivep` double,  
+ `sixp` double,  
+ `sevenp` double,  
+  `eightp` double,  
+  `ninep` double,  
+  `ninefivep` double) 
+ROW FORMAT SERDE  
+  'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe'  
+STORED AS INPUTFORMAT  
+  'org.apache.hadoop.mapred.TextInputFormat'  
+OUTPUTFORMAT  
+  'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat' 
+;
+
+
+
+CREATE TABLE `quantile_industry`( 
+ `industrytypecode` string,
+ `monthstart` int,
+ `monthend` int,
+ `avg` double,  
+ `fivep` double,  
+ `sixp` double,  
+ `sevenp` double,  
+  `eightp` double,  
+  `ninep` double,  
+  `ninefivep` double) 
+ROW FORMAT SERDE  
+  'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe'  
+STORED AS INPUTFORMAT  
+  'org.apache.hadoop.mapred.TextInputFormat'  
+OUTPUTFORMAT  
+  'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat' 
+;
+
+
+nohup sh /opt/spark-2.1.1/bin/spark-submit --master spark://cdh-0:7077 --total-executor-cores 64 --executor-memory 15g --executor-cores 8 quantile_psorindustry.jar 201801 201805 /opt/spark-2.1.1/conf/hive-site.xml 20 ps >FachourClean.log 2>&1 &
+
+
+
+nohup sh /opt/spark-2.1.1/bin/spark-submit --master spark://cdh-0:7077 --total-executor-cores 64 --executor-memory 20g --executor-cores 12 --conf spark.sql.shuffle.partitions=100 complexclean_v7.jar 2017 /opt/spark-2.1.1/conf/hive-site.xml >complexclean.log 2>&1 &

@@ -1,0 +1,48 @@
+select pscode,outputcode,pollutantcode,'"+year+"',avg(revisedflow) avg,percentile_approx(cast(revisedflow as double),array(0.5,0.6,0.7,0.8,0.9,0.95),9999) percentile from  
+(select 
+distinct 
+c.pscode,
+c.outputcode,
+c.pollutantcode,
+c.monitortime,
+c.revisedflow 
+from
+(SELECT 
+a.pscode,
+a.outputcode,
+a.pollutantcode,
+a.monitortime,
+a.revisedflow 
+from 
+(select 
+t1.pscode,
+t1.outputcode,
+t1.pollutantcode,
+t1.monitortime,
+t1.revisedflow,
+t1.availablestatus 
+from 
+stage_cems_gas.s_gasfachourdata t1 
+where t1.month between 201801 and 201812 
+and t1.pollutantcode in ('001', '002', '003') 
+and t1.availablestatus not in (1,7,10) 
+and t1.revisedflow is not null 
+and t1.revisedflow !=0) a,
+stage_cems_gas.s_gasoutput b 
+where a.pscode=b.pscode 
+and a.outputcode=b.outputcode 
+and b.indirectflag !=1) c,
+(SELECT 
+pscode,
+monitorpointcode,
+startdate,
+enddate 
+FROM stage_cems_common.s_stoprunningrecord 
+where startdate >= '2018-01-01' 
+and pscode is not null 
+and monitorpointcode is not null 
+and startdate != 'null') d 
+where c.pscode=d.pscode 
+and c.outputcode=d.monitorpointcode 
+and c.monitortime not between d.startdate and d.enddate) 
+group by pscode,outputcode,pollutantcode;
