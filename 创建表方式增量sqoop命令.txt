@@ -1,0 +1,35 @@
+sqoop import 
+--hive-import 
+--hive-database stage_cems_water_tmp 
+--hive-table s_wateroutputhourdata 
+--create-hive-table 
+--connect "jdbc:sqlserver://10.87.10.65:1433;database=AutoMonitorDBV3;username=sa;password=Jkzx2008" --fields-terminated-by "\t" 
+-m 3 
+--query "select PSCode,OutputCode,MonitorTime,MinFlow,AvgFlow,MaxFlow,RevisedFlow,CouFlow,UpdateDate,IsException,TyperUnit,TyperName,DataSource,AvailableStatus,
+ReviseCause,LastExamineFlag,RevisedTime,RevisedAvgFlow,ExchangeDate from MonitorOperationData.WaterOutputHourData where MonitorTime between '20180701' 
+and dateadd(ms,-3,DATEADD(mm, DATEDIFF(m,0,'20180701')+1, 0)) and \$CONDITIONS and 1=1" 
+--split-by monitortime 
+--target-dir \"hdfs://cdh-0:8020/user/hive/warehouse/%s.db/%s/%s=%s\" 
+--hive-partition-key month 
+--hive-partition-value 201807 
+--mapreduce-job-name s_wateroutputhourdata
+
+
+
+
+"sqoop import 
+--hive-import 
+--hive-database %s 
+--hive-table %s 
+--create-hive-table 
+--connect \"jdbc:%s://%s:%s;database=%s;username=%s;password=%s\" --fields-terminated-by \"\\t\" 
+-m 3 
+--query \"select %s from %s where MonitorTime between '%s01' and dateadd(ms,-3,DATEADD(mm, DATEDIFF(m,0,'%s01')+1, 0)) and \$CONDITIONS and 1=1\" 
+--split-by monitortime 
+--target-dir \"hdfs://cdh-0:8020/user/hive/warehouse/%s.db/%s/%s=%s\" 
+--hive-partition-key %s 
+--hive-partition-value %s 
+--mapreduce-job-name %s" 
+%(jobpara['hive_database_name'],jobpara['hive_database_table'],datasource['datasource_type'],datasource['datasource_ip'],datasource['datasource_port'],jobpara['database_name'],datasource['datasource_username'],
+datasource['datasource_password'],jobpara['database_field'],jobpara['database_table'],partitionkey,partitionkey,jobpara['hive_database_name'],
+jobpara['hive_database_table'],jobpara['pritition_type'],partitionkey,jobpara['pritition_type'],partitionkey,jobpara['hive_database_table'])

@@ -1,0 +1,14 @@
+"sqoop import 
+--hive-import 
+--create-hive-table 
+-m 1 
+--connect \"jdbc:%s://%s:%s;database=%s;username=%s;password=%s\" 
+--fields-terminated-by \"\\t\" 
+--query \"select %s from %s where \$CONDITIONS and 1=1\" 
+--target-dir \"hdfs://cdh-0:8020/user/hive/warehouse/%s.db/%s\" 
+--hive-database %s 
+--hive-table %s 
+--mapreduce-job-name %s" 
+%(datasource['datasource_type'],datasource['datasource_ip'],datasource['datasource_port'],jobpara['database_name'],datasource['datasource_username'],
+datasource['datasource_password'],jobpara['database_field'],jobpara['database_table'],jobpara['hive_database_name'],jobpara['hive_database_table'],
+jobpara['hive_database_name'],jobpara['hive_database_table'],jobpara['hive_database_table'])

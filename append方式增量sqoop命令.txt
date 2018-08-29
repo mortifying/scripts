@@ -1,0 +1,10 @@
+sqoop import
+--append 
+--connect "jdbc:sqlserver://10.87.10.65:1433;database=AutoMonitorDBV3;username=sa;password=Jkzx2008" 
+--fields-terminated-by "\t" 
+-m 3 
+--query "select PSCode,OutputCode,MonitorTime,MinFlow,AvgFlow,MaxFlow,RevisedFlow,CouFlow,UpdateDate,IsException,TyperUnit,TyperName,DataSource,AvailableStatus,
+ReviseCause,LastExamineFlag,RevisedTime,RevisedAvgFlow,ExchangeDate from MonitorOperationData.WaterOutputHourData where MonitorTime between '20180601' 
+and dateadd(ms,-3,DATEADD(mm, DATEDIFF(m,0,'20180601')+1, 0)) and \$CONDITIONS and 1=1" --split-by monitortime 
+--target-dir "hdfs://cdh-0:8020/user/hive/warehouse/stage_cems_water_tmp.db/s_wateroutputhourdata/month=201806" 
+--mapreduce-job-name s_wateroutputhourdata
